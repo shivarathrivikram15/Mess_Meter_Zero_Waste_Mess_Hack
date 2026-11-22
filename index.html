@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="MessMeter: opt out of a mess meal 6 hours ahead so the kitchen cooks only what is eaten.">
+<noscript><style>.rev{opacity:1!important}</style></noscript>
+<title>MessMeter · ZeroWaste Mess</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#menu">Skip to content</a>
+<div id="progress" role="presentation"></div>
+
+<header class="nav" role="banner">
+  <a class="logo" href="#top">Mess<span>Meter</span> 🍛</a>
+  <div class="clock" title="Server time. Supervisors can freeze it to demo the 6-hour cutoff."><span id="clockLabel">🕒 Server time</span> <input type="time" id="clock" value="12:00" aria-label="Server time" disabled><button class="btn small alt" id="clockLive" data-only="supervisor" type="button" title="Return to live server time">Live</button></div>
+  <span id="storageStatus" class="storage-status" role="status" aria-live="polite">● Connecting…</span>
+  <span class="userchip" id="userChip" hidden><span id="userName"></span> <button class="btn small alt" id="logoutBtn" type="button">Sign out</button></span>
+  <nav aria-label="Sections">
+    <a href="#menu">Menu</a><a href="#pass">Meal Pass</a><a href="#kitchen">Kitchen</a>
+    <a href="#waste">Waste Log</a><a href="#kpi">KPIs</a><a href="#rate">Rate</a><a href="#poll">Poll</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">ZeroWaste Mess Hack 🌱</span>
+      <h1>Skip the meal.<br>Save the <em>thali.</em></h1>
+      <p>Tell the mess you're skipping dinner before 6 hours to go, and the kitchen cooks exactly what's needed. Less binned dal, more happy bellies.</p>
+      <a class="btn" href="#menu">Browse this week's menu</a>
+      <a class="btn alt" href="#kitchen" style="margin-left:8px">Supervisor view</a>
+    </div>
+    <div class="stage">
+      <div class="plate3d" id="plate">
+        <div class="l-plate"></div>
+        <div class="l-rice"></div>
+        <div class="l-dal"></div>
+        <div class="l-veg"></div>
+        <div class="l-chut"></div>
+        <div class="top" style="left:100px;top:90px;--k:1.8">🍚</div>
+        <div class="top" style="left:20px;top:130px;--k:2.3">🍲</div>
+        <div class="top" style="left:210px;top:30px;--k:2.8">🥦</div>
+        <div class="top" style="left:210px;top:200px;--k:3.3">🌶️</div>
+        <div class="top" style="left:120px;top:-10px;--k:3.8">🫓</div>
+        <div class="top" style="left:130px;top:240px;--k:4.3">🥭</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee"><div>🍛 DAL TADKA ✦ 🥘 RAJMA CHAWAL ✦ 🫓 ALOO PARATHA ✦ 🥟 SAMOSA ✦ 🍚 JEERA RICE ✦ 🧆 LAUKI KOFTA ✦ 🍮 GULAB JAMUN ✦ 🌶️ MIRCHI BAJJI ✦ 🍛 DAL TADKA ✦ 🥘 RAJMA CHAWAL ✦ 🫓 ALOO PARATHA ✦ 🥟 SAMOSA ✦ 🍚 JEERA RICE ✦ 🧆 LAUKI KOFTA ✦ 🍮 GULAB JAMUN ✦ 🌶️ MIRCHI BAJJI ✦ </div></div>
+
+<!-- HOW -->
+<section id="how">
+  <div class="wrap">
+    <span class="eyebrow">How it works</span>
+    <h2>Four bites to zero waste</h2>
+    <p class="lead">Scroll on, the cards tumble in like a perfectly timed dinner service.</p>
+    <div class="grid">
+      <div class="card rev" data-dir="-1"><div class="step-n">1</div><h3>👀 Peek the menu</h3><p>All 28 meals of the week with Veg / Non-Veg badges.</p></div>
+      <div class="card rev" data-dir="-1"><div class="step-n">2</div><h3>✋ Skip a meal</h3><p>One tap, up to 6 hours before the meal. Cutoffs are strictly enforced.</p></div>
+      <div class="card rev" data-dir="1"><div class="step-n">3</div><h3>🧮 Kitchen scales</h3><p>Headcount × portion × 1.05 safety margin tells staff how much rice to cook.</p></div>
+      <div class="card rev" data-dir="1"><div class="step-n">4</div><h3>📉 Waste drops</h3><p>Supervisors log kilos binned, the dashboard shows the trend, you earn ₹30 rebates.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu" style="background:var(--rice)">
+  <div class="wrap">
+    <span class="eyebrow">Student view</span>
+    <h2>This week's menu</h2>
+    <p class="lead">Pick a day, then tap <b>Skip this meal</b> before the cutoff. The cutoff is checked by the server clock, so it cannot be bypassed from the browser.</p>
+    <div class="wallet" data-only="student">💰 Rebate wallet: <span id="wallet">₹0</span></div>
+    <div class="tabs" id="dayTabs"></div>
+    <div class="grid" id="mealGrid"></div>
+  </div>
+</section>
+
+<!-- PASS -->
+<section id="pass">
+  <div class="wrap passwrap">
+    <div>
+      <span class="eyebrow">Anti-sneak system</span>
+      <h2>Your digital meal pass</h2>
+      <p class="lead">Skipped a meal but showed up hungry anyway? The counter scanner sees a big red cross. Move your mouse over the pass to tilt it.</p>
+      <div class="selrow" id="sel-pass"></div>
+    </div>
+    <div class="pass rev" data-dir="1">
+      <div class="pass-card" id="passCard">
+        <div class="meta">MESSMETER PASS · ROOM B-214</div>
+        <h3 id="passName">Student</h3>
+        <div class="meta" id="passMeal">—</div>
+        <div class="qr" id="qr"></div>
+        <div class="valid" id="passValid">✅ Valid for this meal</div>
+        <div class="cross"><div><b>✕</b><span>OPTED OUT</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KITCHEN -->
+<section id="kitchen" class="dark">
+  <div class="wrap">
+    <span class="eyebrow">Supervisor view</span>
+    <h2>Kitchen command centre</h2>
+    <p class="lead">Live predicted headcount and raw material scaling: <b>(Enrolled − Opt-outs) × Portion × 1.05</b>.</p>
+    <div class="selrow" id="sel-kitchen"></div>
+    <div class="kitchen">
+      <div class="card rev" data-dir="-1">
+        <div class="meta" style="color:#CDB99D">PREDICTED DINERS</div>
+        <div class="big"><span id="headcount">50</span> <small>of <span id="enrolled">50</span> students</small></div>
+        <div class="dots" id="dots"></div>
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap" data-only="supervisor">
+          <button class="btn small" id="simBtn">🎬 Simulate 15 students opting out</button>
+          <button class="btn small alt" id="resetBtn">↺ Reset</button>
+        </div>
+        <p class="rolenote" data-only="student">Simulation tools are for supervisors.</p>
+      </div>
+      <div class="card rev" data-dir="1">
+        <div class="meta" style="color:#CDB99D">RAW MATERIAL SCALING CALCULATOR</div>
+        <table>
+          <thead><tr><th>Ingredient</th><th>Per student</th><th>Cook today</th><th>Saved</th></tr></thead>
+          <tbody id="rawBody"></tbody>
+        </table>
+        <div class="savebox" id="saveBox">—</div>
+        <div class="audit-panel" data-only="supervisor"><h3>🔮 Smart prep forecast</h3><p>Linear trend over the last 14 days of opt-outs predicts tomorrow's demand.</p><div id="forecastBox">—</div></div>
+        <div class="audit-panel" data-only="supervisor"><h3>🚚 NGO rescue ledger</h3><p>Every surplus above 15 kg alerts a partner NGO and is recorded here.</p><div id="ngoList">No alerts yet.</div></div>
+        <div class="audit-panel" data-only="supervisor"><h3>Supervisor activity trail</h3><p>Recent operational actions are stored with timestamps.</p><div id="auditList">Activity appears here as you use the supervisor tools.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WASTE LOG -->
+<section id="waste">
+  <div class="wrap">
+    <span class="eyebrow">Mess staff</span>
+    <h2>Food waste logging console</h2>
+    <p class="lead">After each shift, log the kilos that got binned (and any unserved surplus). More than 15 kg surplus triggers the NGO beacon.</p>
+    <p class="rolenote" data-only="student">Waste logging is for mess staff. Sign in as a supervisor to use it.</p>
+    <div class="grid" data-only="supervisor" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+      <div class="card rev" data-dir="-1">
+        <h3>🗑️ Log a meal shift</h3>
+        <div class="selrow" id="sel-waste" style="margin-top:12px"></div>
+        <div class="formgrid" id="wasteForm"></div>
+        <div class="row" style="margin-top:12px"><label for="surplus">🚚 Surplus unserved (kg)</label><input type="number" id="surplus" min="0" max="500" step="0.5" value="0" inputmode="decimal"></div>
+        <button class="btn green" id="logBtn" style="margin-top:16px">Save waste log</button>
+        <div class="beacon" id="beacon" aria-live="assertive"></div>
+      </div>
+      <div class="card rev" data-dir="1">
+        <h3>📒 Recent logs</h3>
+        <div id="logList" style="margin-top:10px"></div>
+        <button class="btn small alt" id="exportBtn" type="button" style="margin-top:12px">⬇ Export CSV</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KPI -->
+<section id="kpi" style="background:var(--rice)">
+  <div class="wrap">
+    <span class="eyebrow">ZeroWaste dashboard</span>
+    <h2>The numbers on the plate</h2>
+    <p class="lead">14 days of seeded history plus whatever you log live.</p>
+    <div class="kpis">
+      <div class="card kpi rev"><b id="k1">—</b><span>Waste cut vs last week</span></div>
+      <div class="card kpi rev"><b id="k2">—</b><span>Money saved (14 days)</span></div>
+      <div class="card kpi rev"><b id="k3">—</b><span>Meals skipped in advance</span></div>
+      <div class="card kpi rev"><b id="k4">—</b><span>Avg dish rating</span></div>
+      <div class="card kpi rev"><b id="k5">—</b><span id="k5s">Surplus rescued by NGOs</span></div>
+    </div>
+    <div class="charts">
+      <div class="card rev" data-dir="-1"><h3>Daily food waste (kg)</h3><div class="chartbox"><canvas id="cWaste"></canvas></div></div>
+      <div class="card rev" data-dir="1"><h3>Money saved by opt-outs (₹)</h3><div class="chartbox"><canvas id="cMoney"></canvas></div></div>
+      <div class="card rev" data-dir="-1" style="grid-column:1/-1"><h3>🏆 Top-rated vs 👎 most-disliked dishes</h3><div class="chartbox" style="height:340px"><canvas id="cRate"></canvas></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RATE -->
+<section id="rate">
+  <div class="wrap">
+    <span class="eyebrow">Post-meal</span>
+    <h2>How was it, really?</h2>
+    <p class="lead">Rate each dish from 1 to 5 stars and leave a comment. Mess managers see it instantly.</p>
+    <div class="selrow" id="sel-rate"></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+      <div class="card rev" data-dir="-1">
+        <div id="rateList"></div>
+        <textarea id="comment" maxlength="280" aria-label="Comment for the kitchen" placeholder="Anything to tell the cook? (e.g. less salt in the dal 🙏)" style="margin-top:12px"></textarea>
+        <button class="btn" id="rateBtn" style="margin-top:12px">Submit feedback</button>
+      </div>
+      <div class="card rev" data-dir="1"><h3>💬 Fresh feedback</h3><div id="cmtList" style="margin-top:10px"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- POLL -->
+<section id="poll" style="background:var(--rice)">
+  <div class="wrap">
+    <span class="eyebrow">Mess committee</span>
+    <h2>Vote: next Sunday's special dinner</h2>
+    <p class="lead">One vote per student. Winner gets cooked, and nobody throws away what they asked for.</p>
+    <div style="max-width:640px" class="rev" data-dir="-1" id="pollBox"></div>
+  </div>
+</section>
+
+<footer>MessMeter 🍛<small>Cook what's eaten. Eat what's cooked. Built for the ZeroWaste Mess Hack.</small></footer>
+<dialog id="loginDlg" aria-labelledby="loginTitle">
+  <form id="loginForm" method="dialog" autocomplete="on">
+    <h2 id="loginTitle">Sign in</h2>
+    <p class="lead" style="margin-bottom:14px">Students can skip meals, rate dishes and vote. Supervisors run the kitchen, log waste and see the audit trail.</p>
+    <label for="loginUser">Username</label>
+    <input class="field" id="loginUser" name="username" autocomplete="username" required maxlength="40">
+    <label for="loginPass">Password</label>
+    <input class="field" id="loginPass" name="password" type="password" autocomplete="current-password" required maxlength="100">
+    <p id="loginErr" class="loginerr" role="alert"></p>
+    <button class="btn" type="submit" id="loginBtn">Sign in</button>
+    <div id="demoCreds" class="democreds" hidden>
+      <small>Demo server: pick an account to fill the form.</small>
+      <button class="btn small alt" type="button" data-fill="aarav|student123">Student (aarav)</button>
+      <button class="btn small alt" type="button" data-fill="supervisor|supervisor123">Supervisor</button>
+    </div>
+  </form>
+</dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
